@@ -25,8 +25,10 @@ void move_mouse_with_joystick() {
   unsigned int joystick_center_y = 1820;
   unsigned int joystick_deadzone = 100;
 
+  // Linear mapping.
   int mapped_joystick_x = 0;
   int mapped_joystick_y = 0;
+  
   if (joystick_x > joystick_center_x + joystick_deadzone || joystick_x < joystick_center_x - joystick_deadzone) {
     mapped_joystick_x = map(joystick_x, 0, 4096, -15, 15);
   }
