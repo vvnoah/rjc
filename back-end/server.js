@@ -10,9 +10,37 @@ server.listen(1883, function () {
 
 // Handle incoming MQTT messages
 aedes.on("publish", function (packet, client) {
-  if (packet.topic === "packet_name") {
+  if (packet.topic === "media/audio_mute") {
     try {
-      // Do something.
+      robot.keyTap("audio_mute");
+    } catch (error) {
+      console.error("Error processing MQTT message:", error);
+    }
+  }
+  if (packet.topic === "media/audio_vol_up") {
+    try {
+      robot.keyTap("audio_vol_up");
+    } catch (error) {
+      console.error("Error processing MQTT message:", error);
+    }
+  }
+  if (packet.topic === "media/audio_vol_down") {
+    try {
+      robot.keyTap("audio_vol_down");
+    } catch (error) {
+      console.error("Error processing MQTT message:", error);
+    }
+  }
+  if (packet.topic === "media/audio_play") {
+    try {
+      robot.keyTap("audio_play");
+    } catch (error) {
+      console.error("Error processing MQTT message:", error);
+    }
+  }
+  if (packet.topic === "media/audio_pauze") {
+    try {
+      robot.keyTap("audio_pauze")
     } catch (error) {
       console.error("Error processing MQTT message:", error);
     }
