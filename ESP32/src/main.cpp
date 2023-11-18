@@ -3,19 +3,19 @@
 #include "modules/mqtt/mod_mqtt.h"
 #include "modules/joystick/mod_joystick.h"
 
+WiFiClient wifi_client;
+PubSubClient mqtt_client(wifi_client);
+
 void setup()
 {
   Serial.begin(9600);
-
   MOD_MQTT::setup();
-  MOD_JOYSTICK::setup();
   
 }
 
 void loop()
 {
   MOD_MQTT::loop();
-  MOD_JOYSTICK::loop();
 
 
   delay(35);
