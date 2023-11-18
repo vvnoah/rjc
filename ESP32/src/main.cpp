@@ -1,28 +1,25 @@
 #include <Arduino.h>
-#include <BleMouse.h>
 #include <WiFi.h>
 #include <PubSubClient.h>
 
-BleMouse mouse("Joystick Controller", "UCLL");
 WiFiClient wifi_client;
 PubSubClient mqtt_client(wifi_client);
 
-const *char SSID = "";
-const *char PASSWORD = "";
-const char* MQTT_SERVER = ""; // IP
+const char* SSID = "0.0.0.0";
+const char* PASSWORD = "";
+const char* MQTT_SERVER = "0.0.0.0"; // IP
 const int MQTT_PORT = 3000;
 const char* MQTT_USER = "ucll";
-const string MQTT_CLIENTID = "ESP32-" + String(random(0xffff), HEX);
+const String MQTT_CLIENTID = "ESP32-" + String(random(0xffff), HEX);
 
-void move_mouse_with_joystick();
+void get_mapped_joystick_position();
 void connect_mqtt();
 
 void setup() {
   Serial.begin(9600);
-  mouse.begin();
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
-  while (WiFi.status( != WL_CONNECTED)) {
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     delay(500);
   }
@@ -30,24 +27,25 @@ void setup() {
 }
 
 void loop() {
-  if(mouse.isConnected()) {
-    move_mouse_with_joystick();
-  }
-
-  if(Wifi.status() == WL_CONNECTED) {
+  if(WiFi.status() == WL_CONNECTED) {
     if(!mqtt_client.connected()) {
       connect_mqtt();
     }
     mqtt_client.loop();
 
     // IF MODE MEDIA, GET BUTTON INPUT AND PUBLISH MEDIA COMMANDS.
-    mqtt_client.publish("/media/audio_vol_up");
+    mqtt_client.publish("/media/audio_vol_up", "");
   }
 
   delay(35);
 }
 
-void move_mouse_with_joystick() {
+struct JoystickPosition {
+  int x;
+  int y;
+};
+
+JoystickPosition get_mapped_joystick_position(int min, int max) {
   unsigned int joystick_x = analogRead(34);
   unsigned int joystick_y = analogRead(35);
   unsigned int joystick_center_x = 1920;
@@ -55,26 +53,27 @@ void move_mouse_with_joystick() {
   unsigned int joystick_deadzone = 100;
 
   // Linear mapping.
-  int mapped_joystick_x = 0;
-  int mapped_joystick_y = 0;
+  JoystickPosition mapped_joystick_position;
+  mapped_joystick_position.x = 0;
+  mapped_joystick_position.y = 0;
   
   if (joystick_x > joystick_center_x + joystick_deadzone || joystick_x < joystick_center_x - joystick_deadzone) {
-    mapped_joystick_x = map(joystick_x, 0, 4096, -15, 15);
+    mapped_joystick_position.x = map(joystick_x, 0, 4096, min, max);
   }
 
   if (joystick_y > joystick_center_y + joystick_deadzone || joystick_y < joystick_center_y - joystick_deadzone) {
-    mapped_joystick_y = map(joystick_y, 0, 4096, -15, 15);
+    mapped_joystick_position.y = map(joystick_y, 0, 4096, min, max);
   }
 
   Serial.print("\r");
   Serial.print("x: ");
-  Serial.print(mapped_joystick_x);
+  Serial.print(mapped_joystick_position.x);
   Serial.print(" | y: ");
-  Serial.println(mapped_joystick_y);
+  Serial.println(mapped_joystick_position.y);
 
-  mouse.move(mapped_joystick_x, mapped_joystick_y);
+  return mapped_joystick_position;
 } 
 
 void connect_mqtt() {
-  mqtt_client.setServer()
+  mqtt_client.setServer(MQTT_SERVER, MQTT_PORT);
 }
