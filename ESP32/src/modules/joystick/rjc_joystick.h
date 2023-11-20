@@ -8,12 +8,10 @@ struct JoystickPosition {
     int y;
 };
 
-class MOD_JOYSTICK
+class RJC_JOYSTICK
 {
     public:
-    static void setup();
-    static void loop();
-    static JoystickPosition get_mapped_joystick_position(int min, int max);
+    static JoystickPosition get_mapped_position(int min, int max);
 };
 
 #endif

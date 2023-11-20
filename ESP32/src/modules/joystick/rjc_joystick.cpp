@@ -1,14 +1,6 @@
-#include "mod_joystick.h"
+#include "rjc_joystick.h"
 
-void MOD_JOYSTICK::setup()
-{
-}
-
-void MOD_JOYSTICK::loop()
-{
-}
-
-JoystickPosition MOD_JOYSTICK::get_mapped_joystick_position(int min, int max)
+JoystickPosition RJC_JOYSTICK::get_mapped_position(int min, int max)
 {
     unsigned int joystick_x = analogRead(34);
     unsigned int joystick_y = analogRead(35);
