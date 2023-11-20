@@ -15,6 +15,7 @@ static const String mqtt_ID = "ESP32-" + String(random(0xffff), HEX);
 
 void mqtt_callback(char* topic, byte* payload, unsigned int length);
 
+
 void setup()
 {
   Serial.begin(9600);
