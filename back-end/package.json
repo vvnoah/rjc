@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "mqtt": "^5.2.0",
-    "robotjs": "^0.6.0"
+    "robotjs": "^0.6.0",
+    "websocket": "^1.0.34"
   }
 }
