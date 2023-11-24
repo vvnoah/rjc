@@ -1,79 +1,56 @@
 #include <Arduino.h>
 #include <WiFi.h>
-#include <PubSubClient.h>
+#include <WebSocketsServer.h>
+#include <ArduinoJson.h>
+
+#include "modules/joystick/rjc_joystick.h"
 
 WiFiClient wifi_client;
-PubSubClient mqtt_client(wifi_client);
+WebSocketsServer websocket = WebSocketsServer(81);
 
-const char* SSID = "0.0.0.0";
-const char* PASSWORD = "";
-const char* MQTT_SERVER = "0.0.0.0"; // IP
-const int MQTT_PORT = 3000;
-const char* MQTT_USER = "ucll";
-const String MQTT_CLIENTID = "ESP32-" + String(random(0xffff), HEX);
+static const char*  SSID           = "BillyTheRobot";
+static const char*  PASSWORD       = "eloict1234";
 
-void get_mapped_joystick_position();
-void connect_mqtt();
+void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
+    // Handle events here
+}
 
 void setup() {
   Serial.begin(9600);
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
+  Serial.println("Connecting to WiFi ");
   while (WiFi.status() != WL_CONNECTED) {
-    Serial.print(".");
     delay(500);
+    Serial.print(".");
   }
-  Serial.println(WiFi.localIP());
+  Serial.printf("WiFi connected, IP: %s\n", WiFi.localIP().toString().c_str());
+  websocket.begin();
 }
 
 void loop() {
-  if(WiFi.status() == WL_CONNECTED) {
-    if(!mqtt_client.connected()) {
-      connect_mqtt();
-    }
-    mqtt_client.loop();
+  JoystickPosition joystick_position = RJC_JOYSTICK::get_mapped_position(-10, 10);
 
-    // IF MODE MEDIA, GET BUTTON INPUT AND PUBLISH MEDIA COMMANDS.
-    mqtt_client.publish("/media/audio_vol_up", "");
+  // Example: Send joystick position over WebSocket when the joystick is moved
+  if (joystick_position.x != 0 || joystick_position.y != 0) {
+    // Create a JSON document
+    StaticJsonDocument<100> jsonDocument;
+
+    // Populate the JSON document
+    jsonDocument["type"] = "cursor";
+    jsonDocument["data"]["x"] = joystick_position.x;
+    jsonDocument["data"]["y"] = joystick_position.y;
+
+    // Serialize the JSON document to a String
+    String message;
+    serializeJson(jsonDocument, message);
+
+    // Send the message to all connected clients
+    websocket.broadcastTXT(message);
+
+    Serial.println("Sent joystick position over WebSocket: " + message);
   }
 
+  websocket.loop();
   delay(35);
-}
-
-struct JoystickPosition {
-  int x;
-  int y;
-};
-
-JoystickPosition get_mapped_joystick_position(int min, int max) {
-  unsigned int joystick_x = analogRead(34);
-  unsigned int joystick_y = analogRead(35);
-  unsigned int joystick_center_x = 1920;
-  unsigned int joystick_center_y = 1820;
-  unsigned int joystick_deadzone = 100;
-
-  // Linear mapping.
-  JoystickPosition mapped_joystick_position;
-  mapped_joystick_position.x = 0;
-  mapped_joystick_position.y = 0;
-  
-  if (joystick_x > joystick_center_x + joystick_deadzone || joystick_x < joystick_center_x - joystick_deadzone) {
-    mapped_joystick_position.x = map(joystick_x, 0, 4096, min, max);
-  }
-
-  if (joystick_y > joystick_center_y + joystick_deadzone || joystick_y < joystick_center_y - joystick_deadzone) {
-    mapped_joystick_position.y = map(joystick_y, 0, 4096, min, max);
-  }
-
-  Serial.print("\r");
-  Serial.print("x: ");
-  Serial.print(mapped_joystick_position.x);
-  Serial.print(" | y: ");
-  Serial.println(mapped_joystick_position.y);
-
-  return mapped_joystick_position;
-} 
-
-void connect_mqtt() {
-  mqtt_client.setServer(MQTT_SERVER, MQTT_PORT);
 }

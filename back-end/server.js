@@ -1,48 +1,46 @@
-const robot = require("robotjs"); // Library to control pc functions.
-const aedes = require("aedes")();                           //
-const server = require("net").createServer(aedes.handle);   // MQTT Library.
+let WebSocketClient = require('websocket').client;
+const robot = require('robotjs');
 
+let client = new WebSocketClient();
 
-// Connect to the MQTT broker
-server.listen(1883, function () {
-  console.log("MQTT server listening on port 1883");
+client.on('connect', function(connection) {
+  console.log('WebSocket Connected');
+  connection.on('error', function(error) {
+      console.log("Connection Error: " + error.toString());
+  });
+  connection.on('close', function() {
+      console.log('Connection Closed.');
+  });
+  connection.on('message', function(message) {
+    if (typeof message.utf8Data === 'string') {
+        try {
+          const data = JSON.parse(message.utf8Data);
+
+          const type = data.type;
+          const x = data.data.x;
+          const y = data.data.y;
+
+          if(type == "cursor") {
+            moveMouseWithJoystick(x, y);
+          } else if (type == "scroll") {
+            robot.scrollMouse(x, y);
+          }
+
+          console.log(`[ws]: ${type}: ${x}, ${y}`);
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+        }
+      } else {
+        console.error('Received non-string data:', message.utf8Data);
+      }
+  });
 });
 
-// Handle incoming MQTT messages
-aedes.on("publish", function (packet, client) {
-  if (packet.topic === "media/audio_mute") {
-    try {
-      robot.keyTap("audio_mute");
-    } catch (error) {
-      console.error("Error processing MQTT message:", error);
-    }
-  }
-  if (packet.topic === "media/audio_vol_up") {
-    try {
-      robot.keyTap("audio_vol_up");
-    } catch (error) {
-      console.error("Error processing MQTT message:", error);
-    }
-  }
-  if (packet.topic === "media/audio_vol_down") {
-    try {
-      robot.keyTap("audio_vol_down");
-    } catch (error) {
-      console.error("Error processing MQTT message:", error);
-    }
-  }
-  if (packet.topic === "media/audio_play") {
-    try {
-      robot.keyTap("audio_play");
-    } catch (error) {
-      console.error("Error processing MQTT message:", error);
-    }
-  }
-  if (packet.topic === "media/audio_pauze") {
-    try {
-      robot.keyTap("audio_pauze")
-    } catch (error) {
-      console.error("Error processing MQTT message:", error);
-    }
-  }
-});
+client.connect('ws://192.168.1.104:81/');
+
+function moveMouseWithJoystick(x, y) {
+  let pos = robot.getMousePos();
+  pos.x += x + 5;
+  pos.y += y + 5;
+  robot.moveMouse(pos.x, pos.y);
+}
