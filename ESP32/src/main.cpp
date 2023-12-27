@@ -9,7 +9,7 @@
 // WiFiClient wifi_client;
 // WebSocketsServer websocket = WebSocketsServer(81);
 
-// RJC_JOYSTICK Joystick;
+RJC_JOYSTICK rjc_joystick;
 RJC_DISPLAY rjc_display;
 
 // static const char*  SSID           = "";
@@ -41,7 +41,15 @@ void setup()
 
 void loop() 
 {
-  // rjc_joystick_t joystick_data;
+  rjc_display.draw_top_section("System");
+
+  rjc_joystick_t joystick_data;
+  rjc_joystick.update_joystick_position_randomly(&joystick_data);
+
+  Serial.printf("X:%d    Y:%d\n\r", joystick_data.pos_x, joystick_data.pos_y);
+  rjc_display.draw_system_page(&joystick_data);
+
+
   // Joystick.update_joystick_position(&joystick_data);
 
   // if (joystick_data.pos_x != 0 || joystick_data.pos_y != 0) 
