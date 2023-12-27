@@ -1,6 +1,6 @@
 #include "rjc_joystick.h"
 
-JoystickPosition RJC_JOYSTICK::get_mapped_position(int min, int max)
+JoystickPosition get_mapped_position(int min, int max)
 {
     unsigned int joystick_x = analogRead(34);
     unsigned int joystick_y = analogRead(35);
