@@ -8,7 +8,6 @@ JoystickPosition get_mapped_position(int min, int max)
     unsigned int joystick_center_y = 1820;
     unsigned int joystick_deadzone = 100;
 
-    // Linear mapping.
     JoystickPosition mapped_position;
     mapped_position.x = 0;
     mapped_position.y = 0;
