@@ -1,6 +1,8 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "adafruit_ssd1306.h": "c"
+        "adafruit_ssd1306.h": "c",
+        "adafruit_gfx.h": "c",
+        "rjc_display.h": "c"
     }
 }

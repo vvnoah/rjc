@@ -1,32 +1,22 @@
 #include "rjc_joystick.h"
 
-JoystickPosition get_mapped_position(int min, int max)
+void RJC_JOYSTICK::update_joystick_position(rjc_joystick_t *joystick_data)
 {
-    unsigned int joystick_x = analogRead(34);
-    unsigned int joystick_y = analogRead(35);
-    unsigned int joystick_center_x = 1920;
-    unsigned int joystick_center_y = 1820;
-    unsigned int joystick_deadzone = 100;
-
-    JoystickPosition mapped_position;
-    mapped_position.x = 0;
-    mapped_position.y = 0;
-
-    if (joystick_x > joystick_center_x + joystick_deadzone || joystick_x < joystick_center_x - joystick_deadzone)
+    if (joystick_data->pos_x > joystick_data->center_x + joystick_data->deadzone || joystick_data->pos_x < joystick_data->center_x - joystick_data->deadzone)
     {
-        mapped_position.x = map(joystick_x, 0, 4096, min, max);
+        joystick_data->pos_x = map(joystick_data->pos_x, 0, 4096, joystick_data->pos_min, joystick_data->pos_max);
+    } 
+    else
+    {
+        joystick_data->pos_x = 0;
     }
 
-    if (joystick_y > joystick_center_y + joystick_deadzone || joystick_y < joystick_center_y - joystick_deadzone)
+    if (joystick_data->pos_y > joystick_data->center_y + joystick_data->deadzone || joystick_data->pos_y < joystick_data->center_y - joystick_data->deadzone)
     {
-        mapped_position.y = map(joystick_y, 0, 4096, min, max);
+        joystick_data->pos_y = map(joystick_data->pos_y, 0, 4096, joystick_data->pos_min, joystick_data->pos_max);
     }
-
-    Serial.print("\r");
-    Serial.print("x: ");
-    Serial.print(mapped_position.x);
-    Serial.print(" | y: ");
-    Serial.println(mapped_position.y);
-
-    return mapped_position;
+    else
+    {
+        joystick_data->pos_y = 0;
+    }
 }
