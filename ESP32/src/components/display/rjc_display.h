@@ -1,0 +1,26 @@
+#ifndef RJC_DISPLAY_H
+#define RJC_DISPLAY_H
+
+#include <Arduino.h>
+#include <SPI.h> 
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+#include "layout.h"
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define SCREEN_ADDRESS 0x3C
+
+extern Adafruit_SSD1306 display;
+
+class RJC_DISPLAY
+{
+    private:
+    void draw_start_screen();
+
+    public:
+    void begin();
+};
+
+#endif //RJC_DISPLAY_H
