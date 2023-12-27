@@ -10,7 +10,7 @@
 // WebSocketsServer websocket = WebSocketsServer(81);
 
 // RJC_JOYSTICK Joystick;
-RJC_DISPLAY Screen;
+RJC_DISPLAY rjc_display;
 
 // static const char*  SSID           = "";
 // static const char*  PASSWORD       = "";
@@ -21,7 +21,9 @@ void setup()
 
   delay(100);
 
-  Screen.begin();
+  rjc_display.begin();
+
+  delay(100);
 
   // WiFi.mode(WIFI_STA);
   // WiFi.begin(SSID, PASSWORD);
@@ -59,5 +61,4 @@ void loop()
   // }
 
   // websocket.loop();
-  delay(20);
 }
