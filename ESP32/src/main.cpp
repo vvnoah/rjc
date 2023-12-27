@@ -9,8 +9,8 @@
 // WiFiClient wifi_client;
 // WebSocketsServer websocket = WebSocketsServer(81);
 
-// RJC_JOYSTICK Joystick;
-RJC_DISPLAY Screen;
+RJC_JOYSTICK rjc_joystick;
+RJC_DISPLAY rjc_display;
 
 // static const char*  SSID           = "";
 // static const char*  PASSWORD       = "";
@@ -21,7 +21,9 @@ void setup()
 
   delay(100);
 
-  Screen.begin();
+  rjc_display.begin();
+
+  delay(100);
 
   // WiFi.mode(WIFI_STA);
   // WiFi.begin(SSID, PASSWORD);
@@ -39,7 +41,15 @@ void setup()
 
 void loop() 
 {
-  // rjc_joystick_t joystick_data;
+  rjc_display.draw_top_section("System");
+
+  rjc_joystick_t joystick_data;
+  rjc_joystick.update_joystick_position_randomly(&joystick_data);
+
+  Serial.printf("X:%d    Y:%d\n\r", joystick_data.pos_x, joystick_data.pos_y);
+  rjc_display.draw_system_page(&joystick_data);
+
+
   // Joystick.update_joystick_position(&joystick_data);
 
   // if (joystick_data.pos_x != 0 || joystick_data.pos_y != 0) 
@@ -59,5 +69,4 @@ void loop()
   // }
 
   // websocket.loop();
-  delay(20);
 }

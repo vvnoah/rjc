@@ -9,7 +9,9 @@ void RJC_DISPLAY::begin()
         for(;;); // Don't proceed, loop forever
     }
 
-    draw_start_screen();    
+    draw_start_screen();
+
+    display.display();
 }
 
 void RJC_DISPLAY::draw_start_screen()
@@ -24,5 +26,35 @@ void RJC_DISPLAY::draw_start_screen()
     display.display();
     delay(2000);
     display.clearDisplay();
+    display.display();
+}
+
+void RJC_DISPLAY::draw_top_section(String text)
+{
+    display.setTextColor(WHITE);
+    display.setCursor(0, 0);
+    display.setTextSize(2);
+    display.setTextWrap(0);
+    display.printf("%s", text);
+    display.display();
+}
+
+void RJC_DISPLAY::draw_system_page(rjc_joystick_t *joystick_data)
+{
+    display.drawRect(0, 17, 128, 47, WHITE);
+
+    display.setTextColor(WHITE, 0);
+
+    display.setCursor(3, 20);
+    display.setTextSize(1);
+    display.setTextWrap(0);
+    display.printf("IP: 192.168.69.420\n\r");
+    display.display();
+
+    display.setCursor(3, 30);
+    display.printf("X:%d    \n\r", joystick_data->pos_x);
+
+    display.setCursor(53, 30);
+    display.printf("Y:%d    \n\r", joystick_data->pos_y);
     display.display();
 }

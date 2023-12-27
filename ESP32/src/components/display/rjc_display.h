@@ -6,7 +6,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include "layout.h"
+#include "../joystick/rjc_joystick.h"
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
@@ -21,6 +21,8 @@ class RJC_DISPLAY
 
     public:
     void begin();
+    void draw_top_section(String text);
+    void draw_system_page(rjc_joystick_t *joystick_data);
 };
 
 #endif //RJC_DISPLAY_H
