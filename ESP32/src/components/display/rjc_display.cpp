@@ -39,22 +39,25 @@ void RJC_DISPLAY::draw_top_section(String text)
     display.display();
 }
 
-void RJC_DISPLAY::draw_system_page(rjc_joystick_t *joystick_data)
+void RJC_DISPLAY::draw_system_page(rjc_joystick_t *joystick_data, String ip, const char* ssid)
 {
     display.drawRect(0, 17, 128, 47, WHITE);
 
     display.setTextColor(WHITE, 0);
+    display.setTextSize(1);
+    display.setTextWrap(1);
 
     display.setCursor(3, 20);
-    display.setTextSize(1);
-    display.setTextWrap(0);
-    display.printf("IP: 192.168.69.420\n\r");
-    display.display();
+    display.printf("WIFI: %s\n\r", ssid);
 
     display.setCursor(3, 30);
-    display.printf("X:%d    \n\r", joystick_data->pos_x);
+    display.printf("IP: %s\n\r", ip);
 
-    display.setCursor(53, 30);
-    display.printf("Y:%d    \n\r", joystick_data->pos_y);
+    display.setCursor(3, 40);
+    display.printf("X: %i  \n\r", joystick_data->pos_x);
+
+    display.setCursor(53, 40);
+    display.printf("Y: %i  \n\r", joystick_data->pos_y);
+
     display.display();
 }

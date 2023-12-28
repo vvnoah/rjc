@@ -2,6 +2,7 @@
 #define RJC_DISPLAY_H
 
 #include <Arduino.h>
+#include <string.h>
 #include <SPI.h> 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -22,7 +23,7 @@ class RJC_DISPLAY
     public:
     void begin();
     void draw_top_section(String text);
-    void draw_system_page(rjc_joystick_t *joystick_data);
+    void draw_system_page(rjc_joystick_t *joystick_data, String ip, const char* ssid);
 };
 
 #endif //RJC_DISPLAY_H
