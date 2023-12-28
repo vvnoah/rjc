@@ -19,23 +19,28 @@ void setup()
 {
   Serial.begin(9600);
 
-  delay(100);
+  delay(200);
 
   rjc_display.begin();
 
-  delay(100);
+  delay(200);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
-  Serial.println("Connecting to WiFi ");
+
 
   while (WiFi.status() != WL_CONNECTED) 
   {
-    delay(500);
-    Serial.print(".");
-  }
+    delay(200);
+    Serial.println("Connecting to WiFi");
+    rjc_display.draw_top_section("Connecting");
+  } 
 
   Serial.printf("WiFi connected, IP: %s\n", WiFi.localIP().toString().c_str());
+  rjc_display.draw_top_section("Connected!");
+
+  delay(200);
+
   websocket.begin();
 }
 

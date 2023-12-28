@@ -31,11 +31,11 @@ void RJC_DISPLAY::draw_start_screen()
 
 void RJC_DISPLAY::draw_top_section(String text)
 {
-    display.setTextColor(WHITE);
+    display.setTextColor(WHITE, 0);
     display.setCursor(0, 0);
     display.setTextSize(2);
     display.setTextWrap(0);
-    display.printf("%s", text);
+    display.printf("%s    \n\r", text);
     display.display();
 }
 
