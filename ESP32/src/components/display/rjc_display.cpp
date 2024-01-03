@@ -61,3 +61,17 @@ void RJC_DISPLAY::draw_system_page(rjc_joystick_t *joystick_data, String ip, con
 
     display.display();
 }
+
+void RJC_DISPLAY::draw_loading_animation()
+{
+    display.drawRect(10, 30, 108, 10, WHITE);
+    display.display();
+    for(int16_t i = 0; i <= 104; i += 8)
+    {
+        display.fillRect(12, 32, i, 6, WHITE);
+        display.display();
+        delay(500);
+    }
+    display.display();
+    display.clearDisplay();
+}

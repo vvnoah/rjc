@@ -1,5 +1,6 @@
 let WebSocketClient = require('websocket').client;
 const robot = require('robotjs');
+const loudness = require('loudness')
 
 let client = new WebSocketClient();
 
@@ -20,12 +21,28 @@ client.on('connect', function(connection) {
           const x = data.data.x;
           const y = data.data.y;
 
-          if(type == "cursor") {
-            moveMouseWithJoystick(x, y);
-          } else if (type == "scroll") {
-            robot.scrollMouse(x, y);
+          if(type == "cursor") 
+          {
+            let pos = robot.getMousePos();
+            pos.x += x;
+            pos.y += y;
+            robot.moveMouse(pos.x, pos.y);
+          } 
+          else if (type == "scroll") 
+          {
+            robot.scrollMouse(x, y); // NOT WORKING
           }
-
+          else if (type == "media")
+          {
+            if(y > 0)
+            {
+              robot.keyTap("audio_vol_up");
+            }
+            else if(y < 0)
+            {
+              robot.keyTap("audio_vol_down");
+            }
+          }
           console.log(`[ws]: ${type}: ${x}, ${y}`);
         } catch (error) {
           console.error('Error parsing JSON:', error);
@@ -36,11 +53,4 @@ client.on('connect', function(connection) {
   });
 });
 
-client.connect('ws://192.168.1.104:81/');
-
-function moveMouseWithJoystick(x, y) {
-  let pos = robot.getMousePos();
-  pos.x += x + 5;
-  pos.y += y + 5;
-  robot.moveMouse(pos.x, pos.y);
-}
+client.connect('ws://192.168.0.86:81');
