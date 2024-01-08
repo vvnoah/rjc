@@ -35,7 +35,7 @@ void RJC_DISPLAY::draw_top_section(String text)
     display.setCursor(0, 0);
     display.setTextSize(2);
     display.setTextWrap(0);
-    display.printf("%s    \n\r", text);
+    display.printf("%s        \n\r", text);
     display.display();
 }
 

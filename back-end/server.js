@@ -1,6 +1,8 @@
 let WebSocketClient = require('websocket').client;
 const robot = require('robotjs');
-const loudness = require('loudness')
+
+robot.setKeyboardDelay(0);
+robot.setMouseDelay(0);
 
 let client = new WebSocketClient();
 
@@ -15,35 +17,26 @@ client.on('connect', function(connection) {
   connection.on('message', function(message) {
     if (typeof message.utf8Data === 'string') {
         try {
-          const data = JSON.parse(message.utf8Data);
+          const json = JSON.parse(message.utf8Data);
+          console.log(`[ws]: ${json}`);
 
-          const type = data.type;
-          const x = data.data.x;
-          const y = data.data.y;
+          const joystick_x = json.joystick_position.x;
+          const joystick_y = json.joystick_position.y;
+          
+          let mouse_position = robot.getMousePos();
+          mouse_position.x += joystick_x;
+          mouse_position.y += joystick_y;
+          robot.moveMouse(mouse_position, mouse_position.y);
+          
+          if (data.buttons.button_1 = 1)
+          {
+            robot.keyTap("audio_vol_up");
+          }
 
-          if(type == "cursor") 
+          if(data.buttons.button_1 = 1)
           {
-            let pos = robot.getMousePos();
-            pos.x += x;
-            pos.y += y;
-            robot.moveMouse(pos.x, pos.y);
-          } 
-          else if (type == "scroll") 
-          {
-            robot.scrollMouse(x, y); // NOT WORKING
-          }
-          else if (type == "media")
-          {
-            if(y > 0)
-            {
-              robot.keyTap("audio_vol_up");
-            }
-            else if(y < 0)
-            {
-              robot.keyTap("audio_vol_down");
-            }
-          }
-          console.log(`[ws]: ${type}: ${x}, ${y}`);
+            robot.keyTap("audio_vol_down");
+          }          
         } catch (error) {
           console.error('Error parsing JSON:', error);
         }

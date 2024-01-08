@@ -5,28 +5,29 @@
 
 #include "components/joystick/rjc_joystick.h"
 #include "components/display/rjc_display.h"
+#include "components/button/rjc_button.h"
 
 WiFiClient wifi_client;
 WebSocketsServer websocket = WebSocketsServer(81);
 
 RJC_JOYSTICK rjc_joystick;
 RJC_DISPLAY rjc_display;
+RJC_BUTTON button_modes(12);
+RJC_BUTTON button_1(13);
+RJC_BUTTON button_2(14);
 
-static const char*  SSID = "KotAzurPloeg+2";
-static const char*  PASSWORD = "";
+static const char*  SSID = "WiFi-2.4-F508";
+static const char*  PASSWORD = "wd542j9hwappj";
 
-int nu = 0;
-int vroeger = 0;
 int mode_index = 0;
+String modes[] = {"Info", "Cursor"};
 
 void setup() 
 {
   Serial.begin(9600);
-
-  delay(200);
+  delay(50);
 
   rjc_display.begin();
-
   delay(200);
 
   WiFi.mode(WIFI_STA);
@@ -48,95 +49,45 @@ void setup()
   websocket.begin();
 }
 
-String modes[] = {"Info", "Cursor","Scroll", "Media"};
-
 void loop() 
 {
-  nu = digitalRead(12);
-
-  if(nu != vroeger)
+  if(button_modes.clicked())
   {
-    if(nu == HIGH)
+    Serial.printf("previous mode: %s\r\n", modes[mode_index]);
+    if(mode_index < sizeof(modes)/sizeof(modes[0]) - 1)
     {
-      Serial.printf("size of modes: %i\r\n", sizeof(modes)/sizeof(modes[0]));
-      if(mode_index < sizeof(modes)/sizeof(modes[0]) - 1)
-      {
-        Serial.printf("mode index: %i\r\n", mode_index);
-        mode_index++;
-      }
-      else if(mode_index >= sizeof(modes)/sizeof(modes[0]) - 1)
-      {
-        Serial.printf("mode index: %i\r\n", mode_index);
-        mode_index = 0;
-      }
-      Serial.printf("mode index: %i\r\n", mode_index);
+      mode_index++;
     }
+    else if(mode_index >= sizeof(modes)/sizeof(modes[0]) - 1)
+    {
+      mode_index = 0;
+    }
+    Serial.printf("current mode: %s\r\n", modes[mode_index]);
   }
-  vroeger = nu;
 
   rjc_display.draw_top_section(modes[mode_index]);
 
   rjc_joystick_t joystick_data;
   rjc_joystick.update_joystick_position(&joystick_data);
+
   String json_message = "";
+  StaticJsonDocument<100> jsonDocument;
+
+  jsonDocument["joystick_position"]["x"] = joystick_data.pos_x;
+  jsonDocument["joystick_position"]["y"] = joystick_data.pos_y;
+  jsonDocument["buttons"]["button_1"] = 0;
+  jsonDocument["buttons"]["button_2"] = 0;
+  
+  if(button_1.clicked()) jsonDocument["buttons"]["button_1"] = 1;
+  if(button_2.clicked()) jsonDocument["buttons"]["button_2"] = 1;
+
+  serializeJson(jsonDocument, json_message);
+  websocket.broadcastTXT(json_message);
+  Serial.println("Sent data over WebSocket: " + json_message);
 
   if(mode_index == 0)
   {
-      rjc_display.draw_system_page(&joystick_data, WiFi.localIP().toString().c_str(), SSID);
-  }
-
-  if(mode_index == 1)
-  {
-      if (joystick_data.pos_x != 0 || joystick_data.pos_y != 0) 
-      {
-        StaticJsonDocument<100> jsonDocument;
-
-        jsonDocument["type"] = "cursor";
-        jsonDocument["data"]["x"] = joystick_data.pos_x;
-        jsonDocument["data"]["y"] = joystick_data.pos_y;
-        
-        serializeJson(jsonDocument, json_message);
-
-        websocket.broadcastTXT(json_message);
-
-        Serial.println("Sent data over WebSocket: " + json_message);
-      }
-  }
-
-  if(mode_index == 2)
-  {
-      if (joystick_data.pos_x != 0 || joystick_data.pos_y != 0) 
-      {
-        StaticJsonDocument<100> jsonDocument;
-
-        jsonDocument["type"] = "scroll";
-        jsonDocument["data"]["x"] = joystick_data.pos_x;
-        jsonDocument["data"]["y"] = joystick_data.pos_y;
-        
-        serializeJson(jsonDocument, json_message);
-
-        websocket.broadcastTXT(json_message);
-
-        Serial.println("Sent data over WebSocket: " + json_message);
-      }
-  }
-
-  if(mode_index == 3)
-  {
-      if (joystick_data.pos_x != 0 || joystick_data.pos_y != 0) 
-      {
-        StaticJsonDocument<100> jsonDocument;
-
-        jsonDocument["type"] = "media";
-        jsonDocument["data"]["x"] = joystick_data.pos_x;
-        jsonDocument["data"]["y"] = joystick_data.pos_y;
-        
-        serializeJson(jsonDocument, json_message);
-
-        websocket.broadcastTXT(json_message);
-
-        Serial.println("Sent data over WebSocket: " + json_message);
-      }
+    rjc_display.draw_system_page(&joystick_data, WiFi.localIP().toString().c_str(), SSID);
   }
 
   websocket.loop();
