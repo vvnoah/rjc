@@ -16,8 +16,8 @@ RJC_BUTTON button_modes(12);
 RJC_BUTTON button_1(13);
 RJC_BUTTON button_2(14);
 
-static const char*  SSID = "WiFi-2.4-F508";
-static const char*  PASSWORD = "wd542j9hwappj";
+static const char*  SSID = "";
+static const char*  PASSWORD = "";
 
 int mode_index = 0;
 String modes[] = {"Info", "Cursor"};
