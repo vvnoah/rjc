@@ -22,7 +22,7 @@ class RJC_DISPLAY
 
     public:
     void begin();
-    void draw_top_section(String text);
+    void draw_page_title(String text);
     void draw_system_page(rjc_joystick_t *joystick_data, String ip, const char* ssid);
     void draw_loading_animation();
 };

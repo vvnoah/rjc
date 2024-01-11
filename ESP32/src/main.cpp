@@ -16,11 +16,11 @@ RJC_BUTTON button_modes(12);
 RJC_BUTTON button_1(13);
 RJC_BUTTON button_2(14);
 
-static const char*  SSID = "WiFi-2.4-F508";
-static const char*  PASSWORD = "wd542j9hwappj";
+static const char*  SSID = "KotAzurPloeg+2";
+static const char*  PASSWORD = "";
 
 int mode_index = 0;
-String modes[] = {"Info", "Cursor"};
+String modes[] = {"info", "cursor"};
 
 void setup() 
 {
@@ -37,12 +37,12 @@ void setup()
   {
     delay(200);
     Serial.println("Connecting to WiFi");
-    rjc_display.draw_top_section("Connecting");
-    //rjc_display.draw_loading_animation();
+    rjc_display.draw_page_title("Connecting");
+    rjc_display.draw_loading_animation();
   } 
 
   Serial.printf("WiFi connected, IP: %s\n", WiFi.localIP().toString().c_str());
-  rjc_display.draw_top_section("Connected!");
+  rjc_display.draw_page_title("Connected!");
 
   delay(200);
 
@@ -65,25 +65,28 @@ void loop()
     Serial.printf("current mode: %s\r\n", modes[mode_index]);
   }
 
-  rjc_display.draw_top_section(modes[mode_index]);
+  rjc_display.draw_page_title(modes[mode_index]);
 
   rjc_joystick_t joystick_data;
   rjc_joystick.update_joystick_position(&joystick_data);
 
-  String json_message = "";
-  StaticJsonDocument<100> jsonDocument;
+  if(mode_index == 1)
+  {
+    String json_message = "";
+    StaticJsonDocument<100> jsonDocument;
+    jsonDocument["buttons"]["button_1"] = 0;
+    jsonDocument["buttons"]["button_2"] = 0;
 
-  jsonDocument["joystick_position"]["x"] = joystick_data.pos_x;
-  jsonDocument["joystick_position"]["y"] = joystick_data.pos_y;
-  jsonDocument["buttons"]["button_1"] = 0;
-  jsonDocument["buttons"]["button_2"] = 0;
-  
-  if(button_1.clicked()) jsonDocument["buttons"]["button_1"] = 1;
-  if(button_2.clicked()) jsonDocument["buttons"]["button_2"] = 1;
+    jsonDocument["joystick_position"]["x"] = joystick_data.pos_x;
+    jsonDocument["joystick_position"]["y"] = joystick_data.pos_y;
+    
+    if(button_1.clicked()) jsonDocument["buttons"]["button_1"] = 1;
+    if(button_2.clicked()) jsonDocument["buttons"]["button_2"] = 1;
 
-  serializeJson(jsonDocument, json_message);
-  websocket.broadcastTXT(json_message);
-  Serial.println("Sent data over WebSocket: " + json_message);
+    serializeJson(jsonDocument, json_message);
+    websocket.broadcastTXT(json_message);
+    Serial.println("Sent data over WebSocket: " + json_message);
+  }
 
   if(mode_index == 0)
   {

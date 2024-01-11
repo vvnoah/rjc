@@ -18,22 +18,25 @@ client.on('connect', function(connection) {
     if (typeof message.utf8Data === 'string') {
         try {
           const json = JSON.parse(message.utf8Data);
-          console.log(`[ws]: ${json}`);
+          console.log(json);
 
           const joystick_x = json.joystick_position.x;
           const joystick_y = json.joystick_position.y;
+
+          if(joystick_x != 0 || joystick_y != 0)
+          {
+            let mouse_position = robot.getMousePos();
+            mouse_position.x += joystick_x;
+            mouse_position.y += joystick_y;
+            robot.moveMouse(mouse_position.x, mouse_position.y);
+          }          
           
-          let mouse_position = robot.getMousePos();
-          mouse_position.x += joystick_x;
-          mouse_position.y += joystick_y;
-          robot.moveMouse(mouse_position, mouse_position.y);
-          
-          if (data.buttons.button_1 = 1)
+          if (json.buttons.button_1 == 1)
           {
             robot.keyTap("audio_vol_up");
           }
 
-          if(data.buttons.button_1 = 1)
+          if(json.buttons.button_2 == 1)
           {
             robot.keyTap("audio_vol_down");
           }          

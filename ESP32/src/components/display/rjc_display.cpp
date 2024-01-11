@@ -10,8 +10,6 @@ void RJC_DISPLAY::begin()
     }
 
     draw_start_screen();
-
-    display.display();
 }
 
 void RJC_DISPLAY::draw_start_screen()
@@ -29,7 +27,7 @@ void RJC_DISPLAY::draw_start_screen()
     display.display();
 }
 
-void RJC_DISPLAY::draw_top_section(String text)
+void RJC_DISPLAY::draw_page_title(String text)
 {
     display.setTextColor(WHITE, 0);
     display.setCursor(0, 0);
