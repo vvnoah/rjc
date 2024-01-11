@@ -20,7 +20,7 @@ static const char*  SSID = "KotAzurPloeg+2";
 static const char*  PASSWORD = "";
 
 int mode_index = 0;
-String modes[] = {"info", "cursor"};
+String modes[] = {"info", "cursor", "media"};
 
 void setup() 
 {
@@ -65,33 +65,28 @@ void loop()
     Serial.printf("current mode: %s\r\n", modes[mode_index]);
   }
 
-  rjc_display.draw_page_title(modes[mode_index]);
+  String json_message = "";
+  StaticJsonDocument<200> jsonDocument;
+  jsonDocument["mode"] = modes[mode_index];
 
   rjc_joystick_t joystick_data;
   rjc_joystick.update_joystick_position(&joystick_data);
 
-  if(mode_index == 1)
-  {
-    String json_message = "";
-    StaticJsonDocument<100> jsonDocument;
-    jsonDocument["buttons"]["button_1"] = 0;
-    jsonDocument["buttons"]["button_2"] = 0;
+  jsonDocument["buttons"]["button_1"] = 0;
+  jsonDocument["buttons"]["button_2"] = 0;
 
-    jsonDocument["joystick_position"]["x"] = joystick_data.pos_x;
-    jsonDocument["joystick_position"]["y"] = joystick_data.pos_y;
-    
-    if(button_1.clicked()) jsonDocument["buttons"]["button_1"] = 1;
-    if(button_2.clicked()) jsonDocument["buttons"]["button_2"] = 1;
+  jsonDocument["joystick_position"]["x"] = joystick_data.pos_x;
+  jsonDocument["joystick_position"]["y"] = joystick_data.pos_y;
+  
+  if(button_1.clicked()) jsonDocument["buttons"]["button_1"] = 1;
+  if(button_2.clicked()) jsonDocument["buttons"]["button_2"] = 1;
 
-    serializeJson(jsonDocument, json_message);
-    websocket.broadcastTXT(json_message);
-    Serial.println("Sent data over WebSocket: " + json_message);
-  }
+  serializeJson(jsonDocument, json_message);
+  websocket.broadcastTXT(json_message);
+  Serial.println("Sent data over WebSocket: " + json_message);
 
-  if(mode_index == 0)
-  {
-    rjc_display.draw_system_page(&joystick_data, WiFi.localIP().toString().c_str(), SSID);
-  }
+  rjc_display.draw_page_title(modes[mode_index]);
+  rjc_display.draw_system_page(&joystick_data, WiFi.localIP().toString().c_str(), SSID);
 
   websocket.loop();
 }

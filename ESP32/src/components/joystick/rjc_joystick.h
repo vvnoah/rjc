@@ -9,8 +9,8 @@ struct rjc_joystick_t {
     int pin_x = 34;
     int pin_y = 35;
 
-    int pos_min = -10;
-    int pos_max = 10;
+    int pos_min = -20;
+    int pos_max = 20;
 
     int pos_x = 0;
     int pos_y = 0;
